@@ -29,7 +29,6 @@ public class PlatformReleaser : MonoBehaviour
     {
         if (collision.CompareTag("Platform"))
         {
-            print("entrei trigger" + collision.gameObject.name);
             Platform platform = collision.gameObject.GetComponent<Platform>();
             if (platform != null)
             {
