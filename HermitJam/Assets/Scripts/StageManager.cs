@@ -9,12 +9,14 @@ public class StageManager : MonoBehaviour
     [SerializeField] private PlatformPool _floorPool;
     [Inject(Id = "CeilingPool")]
     [SerializeField] private PlatformPool _ceilingPool;
+
+    [SerializeField] private float _timeScaleTickRate = 5f;
+    [SerializeField] private float _timeScaleIncrease = 0.025f; 
     
     // Start is called before the first frame update
     void Start()
     {
-        //Timer.Register(5f, (() => { Time.timeScale += 0.1f; }), null, true, true);
-        Time.timeScale = 2f;
+        Timer.Register(_timeScaleTickRate, (() => { Time.timeScale += _timeScaleIncrease; Debug.Log("Current TimeScale: " + Time.timeScale); }), null, true, true);
     }
 
     // Update is called once per frame
