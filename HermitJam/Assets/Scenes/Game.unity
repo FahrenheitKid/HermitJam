@@ -4373,6 +4373,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _floorPool: {fileID: 824952506}
   _ceilingPool: {fileID: 1071461407}
+  _PlatformReleaser: {fileID: 1184277264}
 --- !u!114 &1513434937
 MonoBehaviour:
   m_ObjectHideFlags: 0
