@@ -21,4 +21,11 @@ namespace HermitJam
         Floor,
         Ceiling
     }
+
+    public enum Difficulty
+    {
+        Easy,
+        Medium,
+        Hard
+    }
 }

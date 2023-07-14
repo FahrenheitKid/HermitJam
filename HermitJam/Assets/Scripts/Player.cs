@@ -110,4 +110,16 @@ public class Player : MonoBehaviour
             
         }
     }
+
+    private void OnTriggerEnter2D(Collider2D col)
+    {
+        if (col.transform.CompareTag("Zombie"))
+        {
+            
+        }
+        else if (col.transform.CompareTag("Slide"))
+        {
+            
+        }
+    }
 }

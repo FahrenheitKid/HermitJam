@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using HermitJam;
 using UnityEngine;
 using Zenject;
-using Random = System.Random;
+using Random = UnityEngine.Random;
 
 public class PlatformReleaser : MonoBehaviour
 {
@@ -12,6 +12,15 @@ public class PlatformReleaser : MonoBehaviour
     [SerializeField] private PlatformPool _floorPool;
     [Inject(Id = "CeilingPool")]
     [SerializeField] private PlatformPool _ceilingPool;
+    public event Action<Platform> OnPlatformRelease;
+
+    private StageManager _stageManager;
+    
+    [Inject]
+    public void Construct(StageManager stageManager)
+    {
+        _stageManager = stageManager;
+    }
     
     // Start is called before the first frame update
     void Start()
@@ -32,16 +41,21 @@ public class PlatformReleaser : MonoBehaviour
             Platform platform = collision.gameObject.GetComponent<Platform>();
             if (platform != null)
             {
+                
+                
                 if (platform.PlatformPosition == PlatformPosition.Floor)
                 {
+                    //we only call the floor one because both floor and ceiling triggers at the same time, so we avoid an useless additional trigger
+                    OnPlatformRelease?.Invoke(platform);
                     _floorPool.ReleasePlatform(platform);
                     
                     // make smart difficulty later
-                    bool hazard = UnityEngine.Random.Range(0, 2) == 0;
-                    bool hazardOnFloor = UnityEngine.Random.Range(0, 2)  == 0;
-                    bool acidHazard = UnityEngine.Random.Range(0, 2) == 0;
-                    bool obstacle = UnityEngine.Random.Range(0, 5) == 0;
-                    bool obstacleOnHazard = hazard && acidHazard && UnityEngine.Random.Range(0, 5) == 0;
+                    bool hazard = Random.Range(0, 2) == 0;
+                    bool hazardOnFloor = Random.Range(0, 2)  == 0;
+                    bool acidHazard = Random.Range(0, 2) == 0;
+                    bool obstacle = Random.Range(0, 5) == 0;
+                    bool obstacleOnHazard = hazard && acidHazard && Random.Range(0, 5) == 0;
+                    
                     
                         PlatformType hazardType = acidHazard ? PlatformType.Acid : PlatformType.Spike;
                         _floorPool.SpawnPlatform(hazardOnFloor && hazard ? hazardType : PlatformType.Platform);
