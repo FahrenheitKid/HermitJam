@@ -57,7 +57,8 @@ public class PlatformPool : MonoBehaviour
     {
         return CreatePlatform(_platformPosition, PlatformType.Spike);
     }
-
+    
+    //called within the Pool class when no available objects to reuse
     private Platform CreatePlatform(PlatformPosition platformPosition, PlatformType platformType = PlatformType.Platform)
     {
         Platform platform;
