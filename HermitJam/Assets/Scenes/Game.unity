@@ -4309,8 +4309,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _rigidbody2D: {fileID: 0}
-  jumpPower: 7.5
-  rotationDuration: 0.75
+  jumpPower: 9
+  rotationDuration: 0.65
   _groundLayer:
     serializedVersion: 2
     m_Bits: 64

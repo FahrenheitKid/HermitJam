@@ -12,6 +12,7 @@ namespace HermitJam
 
         [SerializeField] private float _speed;
         [SerializeField] private float _currentSpeed = 1f;
+        public bool IsHazard => PlatformType != PlatformType.Platform;
         private Rigidbody2D _rigidbody2D;
         
             // Start is called before the first frame update

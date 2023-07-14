@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
+using HermitJam;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Zenject;
@@ -42,17 +44,17 @@ public class Player : MonoBehaviour
     public void OnTapPerformed(InputAction.CallbackContext context)
     {
         Jump();
-        Debug.Log(context);
+        //Debug.Log(context);
     }
     
     public void OnTapHoldPerformed(InputAction.CallbackContext context)
     {
-        Debug.Log(context);
+        //Debug.Log(context);
     }
     
     public void OnSwipePerformed(InputAction.CallbackContext context)
     {
-        Debug.Log(context);
+        //Debug.Log(context);
     }
 
     void Jump()
@@ -80,14 +82,32 @@ public class Player : MonoBehaviour
 
     public void Rotate(bool upsideDown)
     {
-        Transform child = transform.GetChild(0);
+        SpriteRenderer child = transform.GetChild(0)?.GetComponent<SpriteRenderer>();
         if (child)
         {
             if (rotateTween != null)
             {
                 rotateTween.Kill();
             }
-            rotateTween = child.DORotate(new Vector3(0, 0, upsideDown ? 180 : 0),rotationDuration).OnKill(()=> rotateTween = null);
+            rotateTween = child.transform.DORotate(new Vector3(0, 0, upsideDown ? 180 : 0),rotationDuration).OnKill(()=> rotateTween = null);
+            child.flipX = upsideDown;
+
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D col)
+    {
+        if (col.transform.CompareTag("Platform"))
+        {
+            Platform platform = col.transform.GetComponent<Platform>();
+            if (platform != null)
+            {
+                if (platform.IsHazard)
+                {
+                    Debug.Log("morri para " + platform.PlatformType + " "+ platform.PlatformPosition);
+                }
+            }
+            
         }
     }
 }
