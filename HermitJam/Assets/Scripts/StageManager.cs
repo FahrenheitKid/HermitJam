@@ -13,7 +13,8 @@ public class StageManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        //Timer.Register(5f, (() => { Time.timeScale += 0.1f; }), null, true, true);
+        Time.timeScale = 2f;
     }
 
     // Update is called once per frame

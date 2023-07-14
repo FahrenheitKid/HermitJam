@@ -8,7 +8,7 @@ public class GravitySwitch : MonoBehaviour
     {
         if (collision.CompareTag("Player"))
         {
-            print("colidi player");
+            
             Player player = collision.GetComponent<Player>() ?? collision.GetComponentInParent<Player>();
             if (player != null)
             {
