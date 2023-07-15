@@ -20,6 +20,7 @@ public class GameInstaller : MonoInstaller
         else Container.Bind<PlatformReleaser>().FromComponentInHierarchy().AsSingle();
         Container.Bind<PlatformPool>().WithId("FloorPool").FromInstance(_floorPool).AsCached().NonLazy();
         Container.Bind<PlatformPool>().WithId("CeilingPool").FromInstance(_ceilingPool).AsCached().NonLazy();
+        Container.Bind<ObstaclePool>().FromNewComponentOnNewGameObject().WithGameObjectName("ObstaclePool").AsSingle().NonLazy();
         Container.Bind<TouchAction>().AsSingle().NonLazy();
 
     }

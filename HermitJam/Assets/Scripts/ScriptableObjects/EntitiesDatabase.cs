@@ -66,4 +66,9 @@ public class EntitiesDatabase : ScriptableObject
     {
         return Array.Find(_obstacleData, d => d.obstacleType == obstacleType);
     }
+    
+    public ObstacleData[] GetAllObstacleData(ObstacleType obstacleType)
+    {
+        return Array.FindAll(_obstacleData, d => d.obstacleType == obstacleType);
+    }
 }

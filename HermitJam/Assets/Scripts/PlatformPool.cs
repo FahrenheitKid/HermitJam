@@ -18,17 +18,18 @@ public class PlatformPool : MonoBehaviour
     [SerializeField] private float _spawnXPosition = 10f;
     [SerializeField] private bool collectionChecks = true;
     [SerializeField] private int _maxPoolSize;
+    private DiContainer _diContainer;
+    
     public Pool<Platform> PlatformsPool { get; private set; }
     public Pool<Platform> AcidsPool { get; private set; }
     public Pool<Platform> SpikesPool { get; private set; }
-    
-    public Pool<Obstacle> ObstaclePool { get; private set; }
 
     [Inject]
-    void Construct(StageManager stageManager, EntitiesDatabase entitiesDatabase)
+    void Construct(StageManager stageManager, EntitiesDatabase entitiesDatabase, DiContainer diContainer)
     {
         _stageManager = stageManager;
         _entitiesDatabase = entitiesDatabase;
+        _diContainer = diContainer;
     }
 
     private void Awake()
@@ -41,11 +42,11 @@ public class PlatformPool : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        PlatformsPool = new Pool<Platform>(CreateDefaultPlatform, OnTakeFromPool, OnReturnedToPool, OnDestoryPoolObject,
+        PlatformsPool = new Pool<Platform>(CreateDefaultPlatform, OnTakeFromPool, OnReturnedToPool, OnDestroyPoolObject,
             _maxPoolSize);
-        AcidsPool = new Pool<Platform>(CreateAcidPlatform, OnTakeFromPool, OnReturnedToPool, OnDestoryPoolObject,
+        AcidsPool = new Pool<Platform>(CreateAcidPlatform, OnTakeFromPool, OnReturnedToPool, OnDestroyPoolObject,
             _maxPoolSize);
-        SpikesPool = new Pool<Platform>(CreateSpikePlatform, OnTakeFromPool, OnReturnedToPool, OnDestoryPoolObject,
+        SpikesPool = new Pool<Platform>(CreateSpikePlatform, OnTakeFromPool, OnReturnedToPool, OnDestroyPoolObject,
             _maxPoolSize);
     }
 
@@ -76,17 +77,18 @@ public class PlatformPool : MonoBehaviour
         Platform platform;
         switch (platformType)
         {
+            
             case PlatformType.Acid:
-                platform = Instantiate(_acidPrefab, transform).GetComponent<Platform>();
+                platform = _diContainer.InstantiatePrefab(_acidPrefab, transform).GetComponent<Platform>();
                 break;
             case PlatformType.Spike:
-                platform = Instantiate(_spikesPrefab, transform).GetComponent<Platform>();
+                platform = _diContainer.InstantiatePrefab(_spikesPrefab, transform).GetComponent<Platform>();
                 break;
             case PlatformType.Platform:
-                platform = Instantiate(_platformPrefab, transform).GetComponent<Platform>();
+                platform = _diContainer.InstantiatePrefab(_platformPrefab, transform).GetComponent<Platform>();
                 break;
             default:
-                platform = Instantiate(_platformPrefab, transform).GetComponent<Platform>();
+                platform = _diContainer.InstantiatePrefab(_platformPrefab, transform).GetComponent<Platform>();
                 break;
         }
 
@@ -103,8 +105,8 @@ public class PlatformPool : MonoBehaviour
                         if(platformType != PlatformType.Acid)
                             renderer.flipY = true;
                         else
-                        {
-                            if (renderer.transform.parent.name == "Tiles")
+                        {  //here we do some adjustments to the acid sprite when upside down
+                            if (renderer.transform.parent.name == "Tiles" && renderer.transform.GetComponentInParent<Obstacle>() == null)
                             {
                                 renderer.transform.eulerAngles = new Vector3(0, 0, 180f);
                                 renderer.transform.localPosition = new Vector3(renderer.transform.localPosition.x, renderer.transform.localPosition.y * -1f, renderer.transform.localPosition.z);
@@ -129,6 +131,8 @@ public class PlatformPool : MonoBehaviour
     {
         if (platform == null) return;
         
+        platform.ReleaseObstacles();
+        
         switch (platform.PlatformType)
         {
             case PlatformType.Acid:
@@ -144,6 +148,8 @@ public class PlatformPool : MonoBehaviour
                 PlatformsPool.Release(platform);
                 break;
         }
+        
+        
     }
     
     public void SpawnPlatform(PlatformType platformType = PlatformType.Platform,ObstacleType obstacleType = ObstacleType.None)
@@ -164,23 +170,18 @@ public class PlatformPool : MonoBehaviour
                 platform = PlatformsPool.Get();
                 break;
         }
-        
-        //setup obstacle later
-        switch (obstacleType)
+
+        if (obstacleType != ObstacleType.None)
         {
-            case ObstacleType.None:
-                
-                break;
-            case ObstacleType.Zombie:
-                //platform.addObstacle(ZombieType);
-                break;
-            case ObstacleType.Slide:
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(obstacleType), obstacleType, null);
+            platform.AddObstacle(obstacleType);
         }
     }
 
-    private void OnReturnedToPool(Platform platform) => platform?.gameObject.SetActive(false);
-    private void OnDestoryPoolObject(Platform platform) => Destroy(platform);
+    private void OnReturnedToPool(Platform platform)
+    {
+        platform?.gameObject.SetActive(false);
+        platform.Obstacles.Clear();
+    }
+
+    private void OnDestroyPoolObject(Platform platform) => Destroy(platform);
 }

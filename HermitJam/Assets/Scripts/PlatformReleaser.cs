@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using HermitJam;
@@ -53,13 +54,18 @@ public class PlatformReleaser : MonoBehaviour
                     bool hazard = Random.Range(0, 2) == 0;
                     bool hazardOnFloor = Random.Range(0, 2)  == 0;
                     bool acidHazard = Random.Range(0, 2) == 0;
-                    bool obstacle = Random.Range(0, 5) == 0;
+                    bool obstacle = Random.Range(0, 2) == 0;
+                    bool obstacleOnFloor = Random.Range(0, 2)  == 0;
                     bool obstacleOnHazard = hazard && acidHazard && Random.Range(0, 5) == 0;
                     
                     
                         PlatformType hazardType = acidHazard ? PlatformType.Acid : PlatformType.Spike;
-                        _floorPool.SpawnPlatform(hazardOnFloor && hazard ? hazardType : PlatformType.Platform);
-                        _ceilingPool.SpawnPlatform(!hazardOnFloor && hazard ? hazardType : PlatformType.Platform);
+                        ObstacleType obstacleType = obstacle ? (ObstacleType) Random.Range(1,Enum.GetNames(typeof(ObstacleType)).Length) : ObstacleType.None;
+                        
+                        _floorPool.SpawnPlatform(hazardOnFloor && hazard ? hazardType : PlatformType.Platform, 
+                            obstacleOnFloor && obstacle? obstacleType : ObstacleType.None);
+                        _ceilingPool.SpawnPlatform(!hazardOnFloor && hazard ? hazardType : PlatformType.Platform, 
+                            !obstacleOnFloor && obstacle? obstacleType : ObstacleType.None);
                     
                 }
                 else

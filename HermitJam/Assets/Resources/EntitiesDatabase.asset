@@ -12,3 +12,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa0233dc35452ae4fa13d9197cb8e789, type: 3}
   m_Name: EntitiesDatabase
   m_EditorClassIdentifier: 
+  _platformData:
+  - name: 
+    platformType: 0
+    prefab: {fileID: 1058092651281298071, guid: fca939d9ab8c3b24690bba2cc2671a4e, type: 3}
+  - name: 
+    platformType: 1
+    prefab: {fileID: 6720435246217847660, guid: 6cba897bbab33264f8548e68050da1ad, type: 3}
+  - name: 
+    platformType: 2
+    prefab: {fileID: 9043816656913740370, guid: a75085be13cdfbe4288891644f590970, type: 3}
+  _obstacleData:
+  - name: 
+    obstacleType: 1
+    prefab: {fileID: 5176285855078027713, guid: f78a1a600d459e94b9f4a4093f55d81e, type: 3}
+  - name: 
+    obstacleType: 1
+    prefab: {fileID: 5176285855078027713, guid: d6916a4462fa50048bd95720fb3b0787, type: 3}
+  - name: 
+    obstacleType: 2
+    prefab: {fileID: 6312204001370107826, guid: 225ceb1aa1308164385055c4b2a64d87, type: 3}
