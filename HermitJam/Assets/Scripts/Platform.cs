@@ -12,6 +12,8 @@ namespace HermitJam
 
         [SerializeField] private float _speed;
         [SerializeField] private float _currentSpeed = 1f;
+        [field: SerializeField] public List<Obstacle> Obstacles { get; private set; }
+        
         public bool IsHazard => PlatformType != PlatformType.Platform;
         private Rigidbody2D _rigidbody2D;
         

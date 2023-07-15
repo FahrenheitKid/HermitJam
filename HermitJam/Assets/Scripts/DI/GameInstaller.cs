@@ -8,7 +8,7 @@ public class GameInstaller : MonoInstaller
     [SerializeField] private PlatformPool _floorPool;
     [SerializeField] private PlatformPool _ceilingPool;
     [SerializeField] private PlatformReleaser _PlatformReleaser;
-    
+
     [InjectOptional]
     Difficulty m_difficulty  = Difficulty.Medium;
     

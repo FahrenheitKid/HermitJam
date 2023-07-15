@@ -9,9 +9,10 @@ using Zenject;
 public class PlatformPool : MonoBehaviour
 {
     [SerializeField] private StageManager _stageManager;
-    [SerializeField] private GameObject _platformPrefab;
-    [SerializeField] private GameObject _acidPrefab;
-    [SerializeField] private GameObject _spikesPrefab;
+    private EntitiesDatabase _entitiesDatabase;
+    private GameObject _platformPrefab;
+    private GameObject _acidPrefab;
+    private GameObject _spikesPrefab;
 
     [SerializeField] private PlatformPosition _platformPosition;
     [SerializeField] private float _spawnXPosition = 10f;
@@ -20,12 +21,23 @@ public class PlatformPool : MonoBehaviour
     public Pool<Platform> PlatformsPool { get; private set; }
     public Pool<Platform> AcidsPool { get; private set; }
     public Pool<Platform> SpikesPool { get; private set; }
+    
+    public Pool<Obstacle> ObstaclePool { get; private set; }
 
     [Inject]
-    void Construct(StageManager stageManager)
+    void Construct(StageManager stageManager, EntitiesDatabase entitiesDatabase)
     {
         _stageManager = stageManager;
+        _entitiesDatabase = entitiesDatabase;
     }
+
+    private void Awake()
+    {
+        _platformPrefab = _entitiesDatabase.GetPlatformData(PlatformType.Platform).prefab;
+        _acidPrefab = _entitiesDatabase.GetPlatformData(PlatformType.Acid).prefab;
+        _spikesPrefab = _entitiesDatabase.GetPlatformData(PlatformType.Spike).prefab;
+    }
+
     // Start is called before the first frame update
     void Start()
     {
