@@ -36,7 +36,6 @@ namespace HermitJam
             Timer.Register(_timeScaleTickRate, (() =>
             {
                 Time.timeScale += _timeScaleIncrease;
-                Debug.Log("Current TimeScale: " + Time.timeScale);
             }), null, true, true);
 
             m_platformReleaser.OnPlatformRelease += OnPlatformReleased;

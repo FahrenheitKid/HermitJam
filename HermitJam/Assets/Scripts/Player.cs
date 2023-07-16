@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Zenject;
 
-public class Player : MonoBehaviour
+public partial class Player : MonoBehaviour
 {
     private TouchAction _touchInput;
     [SerializeField] private Rigidbody2D _rigidbody2D;
@@ -16,8 +16,47 @@ public class Player : MonoBehaviour
     [SerializeField] private LayerMask _groundLayer;
 
     private Tween rotateTween;
-    public bool DownGravity => _rigidbody2D?.gravityScale > 0;
-    [field: SerializeField] public bool Grounded { get; private set; }
+    [SerializeField] private bool _grounded;
+    [SerializeField] private bool _sliding;
+    [SerializeField] private bool _shooting;
+
+    public bool Grounded
+    {
+        get => _grounded;
+        private set
+        {
+            _grounded = value; 
+            if(_animator) _animator.SetBool(GroundedAnimatorBool,_grounded);
+        }
+    }
+
+    public bool Sliding
+    {
+        get => _sliding;
+        private set
+        {
+            _sliding = value;
+            if(_animator) _animator.SetBool(SlidingAnimatorBool,_sliding);
+        }
+    }
+
+    public bool Shooting
+    {
+        get => _shooting;
+        private set
+        {
+            _shooting = value;
+            if(_animator) _animator.SetBool(ShootingAnimatorBool,_shooting);
+        }
+    }
+
+    public bool DownGravity
+    {
+        get { return _rigidbody2D?.gravityScale > 0; }
+    }
+
+    [SerializeField] private float slideDuration = 1f;
+    private Timer SlideTimer;
 
     [Inject]
     public void Construct(TouchAction touchInput)
@@ -29,10 +68,18 @@ public class Player : MonoBehaviour
     void Start()
     {
         _rigidbody2D = GetComponent<Rigidbody2D>();
+        if (!_animator) _animator = GetComponentInChildren<Animator>() ?? GetComponent<Animator>();
+        
         _touchInput.Touch.Enable();
         _touchInput.Touch.TouchPress.performed += OnTapPerformed;
         _touchInput.Touch.TouchHold.performed += OnTapHoldPerformed;
-        _touchInput.Touch.TouchSwipe.performed += OnSwipePerformed;
+        _touchInput.Touch.TouchHold.canceled += OnTapHoldCanceled;
+        _touchInput.Touch.TouchSwipe.started += OnSwipePerformed;
+    }
+
+    private void Update()
+    {
+        //Grounded = Physics2D.Raycast(transform.position, DownGravity ? Vector3.down : Vector3.up, 1.37f, _groundLayer);
     }
 
     // Update is called once per frame
@@ -49,17 +96,25 @@ public class Player : MonoBehaviour
     
     public void OnTapHoldPerformed(InputAction.CallbackContext context)
     {
+        ToggleShooting(true);
+        //Debug.Log(context);
+    }
+    
+    public void OnTapHoldCanceled(InputAction.CallbackContext context)
+    {
+        ToggleShooting(false);
         //Debug.Log(context);
     }
     
     public void OnSwipePerformed(InputAction.CallbackContext context)
     {
+        Slide();
         //Debug.Log(context);
     }
 
     void Jump()
     {
-        if(!Grounded) return;
+        if(!Grounded || Sliding) return;
         if (_rigidbody2D)
         {
             _rigidbody2D.AddForce(DownGravity ? Vector2.up * jumpPower : Vector2.down * jumpPower,ForceMode2D.Impulse);
@@ -68,6 +123,36 @@ public class Player : MonoBehaviour
         //List<Collider2D> contacts = new List<Collider2D>();
         //_rigidbody2D.GetContacts(contacts);
         
+    }
+
+    void Shoot()
+    {
+        if(Sliding) return;
+        //trigger start shooting bullets here 
+    }
+
+    void ToggleShooting(bool startShooting)
+    {
+        if(Sliding || Shooting) return;
+        
+        
+        Shooting = true;
+    }
+    
+    void Slide()
+    {
+        if(Sliding || !Grounded || SlideTimer?.isDone == false) return;
+
+        Sliding = true;
+        if (SlideTimer?.isDone == true)
+        {
+           SlideTimer.Cancel();
+        }
+            SlideTimer = Timer.Register(slideDuration, (() =>
+            {
+                Sliding = false;
+                Debug.Log("terminei slide " + Sliding);
+            }));
     }
 
     public void SwitchGravity()
@@ -121,5 +206,13 @@ public class Player : MonoBehaviour
         {
             
         }
+    }
+
+    private void OnDisable()
+    {
+        _touchInput.Touch.TouchPress.performed -= OnTapPerformed;
+        _touchInput.Touch.TouchHold.performed -= OnTapHoldPerformed;
+        _touchInput.Touch.TouchHold.canceled -= OnTapHoldCanceled;
+        _touchInput.Touch.TouchSwipe.performed -= OnSwipePerformed;
     }
 }

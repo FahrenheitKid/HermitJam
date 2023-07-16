@@ -5,6 +5,7 @@ using System.Linq;
 using HermitJam;
 using UnityEngine;
 using Zenject;
+using Random = UnityEngine.Random;
 
 public class ObstaclePool : MonoBehaviour
 {
@@ -69,14 +70,15 @@ public class ObstaclePool : MonoBehaviour
         Obstacle obstacle;
         switch (obstacleType)
         {
+                
             case ObstacleType.Slide:
                 obstacle = _diContainer.InstantiatePrefab(_slidePrefab).GetComponent<Obstacle>();
                 break;
             case ObstacleType.Zombie:
-                obstacle = _diContainer.InstantiatePrefab(prefabIndex <= -1 ? _zombiePrefabs.GetRandom() : _zombiePrefabs.ElementAtOrDefault(prefabIndex)).GetComponent<Obstacle>();
+                obstacle = _diContainer.InstantiatePrefab(prefabIndex <= -1 ? _zombiePrefabs.ElementAtOrDefault(Random.Range(0, _zombiePrefabs.Count)): _zombiePrefabs.ElementAtOrDefault(prefabIndex)).GetComponent<Obstacle>();
                 break;
             default:
-                obstacle = _diContainer.InstantiatePrefab(prefabIndex <= -1 ? _zombiePrefabs.GetRandom() : _zombiePrefabs.ElementAtOrDefault(prefabIndex)).GetComponent<Obstacle>();
+                obstacle = _diContainer.InstantiatePrefab(prefabIndex <= -1 ? _zombiePrefabs.ElementAtOrDefault(Random.Range(0, _zombiePrefabs.Count)) : _zombiePrefabs.ElementAtOrDefault(prefabIndex)).GetComponent<Obstacle>();
                 break;
         }
 
