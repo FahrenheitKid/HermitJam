@@ -9,7 +9,7 @@ namespace HermitJam
     [RequireComponent(typeof(Collider2D))]
     public class Obstacle : MonoBehaviour
     {
-        public ObstacleType ObstacleType { get; private set; }
+        [field: SerializeField] public ObstacleType ObstacleType { get; private set; }
         public PlatformPosition PlatformPosition { get; private set; }
     
         public Collider2D Collider { get; private set; }
@@ -36,20 +36,21 @@ namespace HermitJam
         public void SetPlatformPosition(PlatformPosition platformPosition)
         {
             PlatformPosition = platformPosition;
-            if (platformPosition == PlatformPosition.Ceiling)
-            {
-                foreach (var renderer in GetComponentsInChildren<SpriteRenderer>())
+            foreach (var renderer in GetComponentsInChildren<SpriteRenderer>())
                 {
                     if (renderer != null)
                     {
                         if(ObstacleType != ObstacleType.Slide && ObstacleType != ObstacleType.None)
-                            renderer.flipY = true;
+                            renderer.flipY = platformPosition == PlatformPosition.Ceiling;
                         
                     }
                 }
-                //todo fix the offset position of obstacles
-                transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y * -3f, transform.localPosition.z);
-            }
+
+                float yOffset = ObstacleType == ObstacleType.Slide ?  -3f : -2f;
+                yOffset = platformPosition == PlatformPosition.Ceiling ? yOffset : 1f;
+
+                transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y * yOffset, transform.localPosition.z);
+            
         }
 
         // Update is called once per frame

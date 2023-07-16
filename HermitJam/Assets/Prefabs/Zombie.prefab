@@ -26,7 +26,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4113600439603769140}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.6141753, y: -1.2785813, z: 2.8434832}
+  m_LocalPosition: {x: 0, y: 0.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 6032535014599487212}
@@ -184,20 +184,20 @@ CompositeCollider2D:
   m_ColliderPaths:
   - m_Collider: {fileID: 5157145041194004763}
     m_ColliderPaths:
-    - - X: -20547507
-        Y: -22247692
-      - X: -20547507
-        Y: -5476435
-      - X: -30839420
-        Y: -5476728
-      - X: -30839127
-        Y: -22247692
+    - - X: 5594246
+        Y: -4461879
+      - X: 5594246
+        Y: 12309377
+      - X: -4697666
+        Y: 12309084
+      - X: -4697373
+        Y: -4461879
   m_CompositePaths:
     m_Paths:
-    - - {x: -2.05478, y: -2.224769}
-      - {x: -2.05478, y: -0.5476435}
-      - {x: -3.083942, y: -0.54770213}
-      - {x: -3.0838835, y: -2.224769}
+    - - {x: 0.5593953, y: -0.4461879}
+      - {x: 0.5593953, y: 1.2309377}
+      - {x: -0.46976662, y: 1.2308791}
+      - {x: -0.469708, y: -0.4461879}
   m_VertexDistance: 0.0005
   m_OffsetDistance: 0.00005
 --- !u!114 &8604552670637678449
@@ -212,3 +212,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ea575c08aba9b0419af850b26c05eaf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <ObstacleType>k__BackingField: 1

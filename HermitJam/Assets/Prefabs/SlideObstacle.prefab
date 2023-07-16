@@ -511,6 +511,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ea575c08aba9b0419af850b26c05eaf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <ObstacleType>k__BackingField: 2
 --- !u!1 &6832444397370317911
 GameObject:
   m_ObjectHideFlags: 0
