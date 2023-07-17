@@ -56,16 +56,17 @@ public class PlatformReleaser : MonoBehaviour
                     bool acidHazard = Random.Range(0, 2) == 0;
                     bool obstacle = Random.Range(0, 2) == 0;
                     bool obstacleOnFloor = Random.Range(0, 2)  == 0;
-                    bool obstacleOnHazard = hazard && acidHazard && (hazardOnFloor == obstacleOnFloor) && Random.Range(0, 5) == 0;
+                    if (obstacleOnFloor == hazardOnFloor && obstacle && acidHazard == false) acidHazard = true;
+                    bool obstacleOnHazard = hazard && acidHazard && (hazardOnFloor == obstacleOnFloor);
                     
                     
                         PlatformType hazardType = acidHazard ? PlatformType.Acid : PlatformType.Spike;
                         ObstacleType obstacleType = obstacle ? (ObstacleType) Random.Range(1,Enum.GetNames(typeof(ObstacleType)).Length) : ObstacleType.None;
                         
                         _floorPool.SpawnPlatform(hazardOnFloor && hazard ? hazardType : PlatformType.Platform, 
-                            obstacleOnFloor && obstacle && (hazardOnFloor == obstacleOnHazard) ? obstacleType : ObstacleType.None);
+                            obstacleOnFloor && obstacle ? obstacleType : ObstacleType.None);
                         _ceilingPool.SpawnPlatform(!hazardOnFloor && hazard ? hazardType : PlatformType.Platform, 
-                            !obstacleOnFloor && obstacle && (!hazardOnFloor == !obstacleOnHazard)  ? obstacleType : ObstacleType.None);
+                            !obstacleOnFloor && obstacle ? obstacleType : ObstacleType.None);
                     
                 }
                 else
