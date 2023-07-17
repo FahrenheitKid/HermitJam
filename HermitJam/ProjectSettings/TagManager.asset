@@ -8,6 +8,7 @@ TagManager:
   - Zombie
   - Slide
   - Obstacle
+  - Bullet
   layers:
   - Default
   - TransparentFX

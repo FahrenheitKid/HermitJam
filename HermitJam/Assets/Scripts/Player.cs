@@ -22,7 +22,7 @@ public partial class Player : MonoBehaviour
     [SerializeField] private bool _dead;
     [SerializeField] private bool _poisoned;
     [SerializeField] private GameObject lastAcidTouched;
-    private const float distanceBetweenPlatforms = 5f;
+    private const float DistanceBetweenPlatforms = 5f;
 
     public bool Grounded
     {
@@ -80,8 +80,11 @@ public partial class Player : MonoBehaviour
 
     [SerializeField] private float slideDuration = 1.5f;
     [SerializeField] private float poisonDuration = 5f;
-    private Timer SlideTimer;
-    private Timer PoisonTimer;
+    [SerializeField] private float rateOfFire = 0.25f;
+    [SerializeField] private Weapon _weapon;
+    private Timer m_SlideTimer;
+    private Timer m_PoisonTimer;
+    private Timer m_WeaponTimer;
 
     [Inject]
     public void Construct(TouchAction touchInput)
@@ -94,6 +97,7 @@ public partial class Player : MonoBehaviour
     {
         _rigidbody2D = GetComponent<Rigidbody2D>();
         if (!_animator) _animator = GetComponentInChildren<Animator>() ?? GetComponent<Animator>();
+        if (!_weapon) _weapon = GetComponentInChildren<Weapon>() ?? GetComponent<Weapon>();
         
         _touchInput.Touch.Enable();
         _touchInput.Touch.TouchPress.performed += OnTapPerformed;
@@ -153,15 +157,34 @@ public partial class Player : MonoBehaviour
     void Shoot()
     {
         if(Sliding || !Shooting || Dead) return;
-        //trigger start shooting bullets here 
+        
+        _weapon.Shoot();
     }
 
     void ToggleShooting(bool startShooting)
     {
-        if(Sliding || Dead) return;
+        if(Sliding || Dead || _weapon == null) return;
         
         
         Shooting = startShooting;
+
+        if (Shooting)
+        {
+            if (m_WeaponTimer?.isDone == null)
+            {
+                m_WeaponTimer = Timer.Register(rateOfFire, Shoot, null, true, true);
+                Shoot();
+            }
+            else if (m_WeaponTimer?.isPaused == true ||m_WeaponTimer?.isDone == true)
+            {
+                m_WeaponTimer.Complete();
+                m_WeaponTimer.Restart();
+            }
+        }
+        else
+        {
+            m_WeaponTimer?.Pause();
+        }
     }
     
     void Slide()
@@ -169,9 +192,9 @@ public partial class Player : MonoBehaviour
         if(Sliding || !Grounded  || Dead) return;
 
         Sliding = true;
-        if (SlideTimer?.isDone != true)
+        if (m_SlideTimer?.isDone != true)
         {
-            SlideTimer = Timer.Register(slideDuration, (() =>
+            m_SlideTimer = Timer.Register(slideDuration, (() =>
             {
                 Sliding = false;
                 Debug.Log("terminei slide " + Sliding);
@@ -179,7 +202,7 @@ public partial class Player : MonoBehaviour
         }
         else
         {
-            SlideTimer.Restart();
+            m_SlideTimer.Restart();
         }
             
     }
@@ -200,16 +223,16 @@ public partial class Player : MonoBehaviour
         if (Poisoned)
         {
             Die();
-            PoisonTimer?.Cancel();
+            m_PoisonTimer?.Cancel();
             return;
         }
         SpriteRenderer child = transform.GetChild(0)?.GetComponent<SpriteRenderer>();
         if (child)
         {
             child.DOColor(Color.green, 1.5f);
-            if (PoisonTimer?.isDone != true)
+            if (m_PoisonTimer?.isDone != true)
             {
-                PoisonTimer = Timer.Register(poisonDuration, (() =>
+                m_PoisonTimer = Timer.Register(poisonDuration, (() =>
                 {
                     child.DOColor(Color.white, 1.5f);
                     Poisoned = false;
@@ -217,7 +240,7 @@ public partial class Player : MonoBehaviour
             }
             else
             {
-                PoisonTimer.Restart();
+                m_PoisonTimer.Restart();
             }
         }
 
@@ -258,7 +281,7 @@ public partial class Player : MonoBehaviour
                     {
                         bool isAcidRightNextToLast = false;
                         if(lastAcidTouched != null)
-                            isAcidRightNextToLast = Vector3.Distance(platform.transform.position, lastAcidTouched.transform.position) <= distanceBetweenPlatforms + distanceBetweenPlatforms * 0.05f;
+                            isAcidRightNextToLast = Vector3.Distance(platform.transform.position, lastAcidTouched.transform.position) <= DistanceBetweenPlatforms + DistanceBetweenPlatforms * 0.05f;
                         
                         //we do this so if there is acids in a row, we treat it as one big "acid"
                         if (isAcidRightNextToLast == false)
@@ -301,7 +324,7 @@ public partial class Player : MonoBehaviour
             {
                 if (obstacle.ObstacleType == ObstacleType.Slide)
                 {
-                    SlideTimer?.Complete();
+                    m_SlideTimer?.Complete();
                 }
             }
         }
@@ -309,7 +332,7 @@ public partial class Player : MonoBehaviour
 
     public void Die()
     {
-        Dead = true;
+        //Dead = true;
         
     }
 

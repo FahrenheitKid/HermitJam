@@ -32,3 +32,4 @@ MonoBehaviour:
   - name: 
     obstacleType: 2
     prefab: {fileID: 6312204001370107826, guid: 225ceb1aa1308164385055c4b2a64d87, type: 3}
+  <DefaultBullet>k__BackingField: {fileID: 6671914529720565083, guid: 1cd36a190c28f1f468e2f3dafdb24e30, type: 3}

@@ -45,6 +45,7 @@ public class EntitiesDatabase : ScriptableObject
     
     [FormerlySerializedAs("_entityData")] [SerializeField] private PlatformData[] _platformData;
     [SerializeField] private ObstacleData[] _obstacleData;
+    [field: SerializeField] public GameObject DefaultBullet { get; private set; }
     // Start is called before the first frame update
     void Start()
     {

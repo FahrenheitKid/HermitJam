@@ -133,8 +133,15 @@ public class ObstaclePool : MonoBehaviour
         if (obstacle == null) return;
             obstacle.gameObject.SetActive(true);
     }
-    
-    private void OnReturnedToPool(Obstacle obstacle) => obstacle?.gameObject.SetActive(false);
+
+    private void OnReturnedToPool(Obstacle obstacle)
+    {
+
+        obstacle?.gameObject.SetActive(false);
+        if(obstacle.ObstacleType == ObstacleType.Zombie) obstacle.GetComponent<Zombie>()?.ResetState();
+        
+    }
+
     private void OnDestroyPoolObject(Obstacle obstacle) => GameObject.Destroy(obstacle);
 
     // Update is called once per frame
