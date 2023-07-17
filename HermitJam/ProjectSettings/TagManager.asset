@@ -7,6 +7,7 @@ TagManager:
   - Platform
   - Zombie
   - Slide
+  - Obstacle
   layers:
   - Default
   - TransparentFX

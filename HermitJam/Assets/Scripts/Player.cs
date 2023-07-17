@@ -19,6 +19,10 @@ public partial class Player : MonoBehaviour
     [SerializeField] private bool _grounded;
     [SerializeField] private bool _sliding;
     [SerializeField] private bool _shooting;
+    [SerializeField] private bool _dead;
+    [SerializeField] private bool _poisoned;
+    [SerializeField] private GameObject lastAcidTouched;
+    private const float distanceBetweenPlatforms = 5f;
 
     public bool Grounded
     {
@@ -49,14 +53,35 @@ public partial class Player : MonoBehaviour
             if(_animator) _animator.SetBool(ShootingAnimatorBool,_shooting);
         }
     }
+    
+    public bool Dead
+    {
+        get => _dead;
+        private set
+        {
+            _dead = value;
+            if(_animator) _animator.SetBool(DeadAnimatorBool,_dead);
+        }
+    }
+    
+    public bool Poisoned
+    {
+        get => _poisoned;
+        private set
+        {
+            _poisoned = value;
+        }
+    }
 
     public bool DownGravity
     {
         get { return _rigidbody2D?.gravityScale > 0; }
     }
 
-    [SerializeField] private float slideDuration = 1f;
+    [SerializeField] private float slideDuration = 1.5f;
+    [SerializeField] private float poisonDuration = 5f;
     private Timer SlideTimer;
+    private Timer PoisonTimer;
 
     [Inject]
     public void Construct(TouchAction touchInput)
@@ -74,7 +99,7 @@ public partial class Player : MonoBehaviour
         _touchInput.Touch.TouchPress.performed += OnTapPerformed;
         _touchInput.Touch.TouchHold.performed += OnTapHoldPerformed;
         _touchInput.Touch.TouchHold.canceled += OnTapHoldCanceled;
-        _touchInput.Touch.TouchSwipe.started += OnSwipePerformed;
+        _touchInput.Touch.TouchSwipe.performed += OnSwipePerformed;
     }
 
     private void Update()
@@ -114,7 +139,7 @@ public partial class Player : MonoBehaviour
 
     void Jump()
     {
-        if(!Grounded || Sliding) return;
+        if(!Grounded || Sliding || Dead) return;
         if (_rigidbody2D)
         {
             _rigidbody2D.AddForce(DownGravity ? Vector2.up * jumpPower : Vector2.down * jumpPower,ForceMode2D.Impulse);
@@ -127,32 +152,36 @@ public partial class Player : MonoBehaviour
 
     void Shoot()
     {
-        if(Sliding) return;
+        if(Sliding || !Shooting || Dead) return;
         //trigger start shooting bullets here 
     }
 
     void ToggleShooting(bool startShooting)
     {
-        if(Sliding || Shooting) return;
+        if(Sliding || Dead) return;
         
         
-        Shooting = true;
+        Shooting = startShooting;
     }
     
     void Slide()
     {
-        if(Sliding || !Grounded || SlideTimer?.isDone == false) return;
+        if(Sliding || !Grounded  || Dead) return;
 
         Sliding = true;
-        if (SlideTimer?.isDone == true)
+        if (SlideTimer?.isDone != true)
         {
-           SlideTimer.Cancel();
-        }
             SlideTimer = Timer.Register(slideDuration, (() =>
             {
                 Sliding = false;
                 Debug.Log("terminei slide " + Sliding);
-            }));
+            }),null,true);
+        }
+        else
+        {
+            SlideTimer.Restart();
+        }
+            
     }
 
     public void SwitchGravity()
@@ -163,6 +192,37 @@ public partial class Player : MonoBehaviour
         if(_rigidbody2D)
             _rigidbody2D.gravityScale *= -1;
         Rotate(!DownGravity);
+    }
+
+    void Poison()
+    {
+
+        if (Poisoned)
+        {
+            Die();
+            PoisonTimer?.Cancel();
+            return;
+        }
+        SpriteRenderer child = transform.GetChild(0)?.GetComponent<SpriteRenderer>();
+        if (child)
+        {
+            child.DOColor(Color.green, 1.5f);
+            if (PoisonTimer?.isDone != true)
+            {
+                PoisonTimer = Timer.Register(poisonDuration, (() =>
+                {
+                    child.DOColor(Color.white, 1.5f);
+                    Poisoned = false;
+                }),null,true);
+            }
+            else
+            {
+                PoisonTimer.Restart();
+            }
+        }
+
+        Poisoned = true;
+
     }
 
     public void Rotate(bool upsideDown)
@@ -189,7 +249,26 @@ public partial class Player : MonoBehaviour
             {
                 if (platform.IsHazard)
                 {
-                    Debug.Log("morri para " + platform.PlatformType + " "+ platform.PlatformPosition);
+                    if (platform.PlatformType == PlatformType.Spike)
+                    {
+                        Die();
+                        Debug.Log("morri para " + platform.PlatformType + " "+ platform.PlatformPosition);
+                    }
+                    else if (platform.PlatformType == PlatformType.Acid)
+                    {
+                        bool isAcidRightNextToLast = false;
+                        if(lastAcidTouched != null)
+                            isAcidRightNextToLast = Vector3.Distance(platform.transform.position, lastAcidTouched.transform.position) <= distanceBetweenPlatforms + distanceBetweenPlatforms * 0.05f;
+                        
+                        //we do this so if there is acids in a row, we treat it as one big "acid"
+                        if (isAcidRightNextToLast == false)
+                        {
+                            Debug.Log("triggei poison " + Poisoned);
+                            Poison();
+                        }
+                        lastAcidTouched = platform.gameObject;
+                    }
+                    
                 }
             }
             
@@ -198,14 +277,40 @@ public partial class Player : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D col)
     {
-        if (col.transform.CompareTag("Zombie"))
+        if (col.transform.CompareTag("Obstacle"))
         {
+            Obstacle obstacle = col.transform.GetComponent<Obstacle>();
+            if (obstacle != null)
+            {
+                if ((obstacle.ObstacleType == ObstacleType.Slide && !Sliding))
+                {
+                    Die();
+                }
+                
+            }
             
         }
-        else if (col.transform.CompareTag("Slide"))
+    }
+
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.transform.CompareTag("Obstacle"))
         {
-            
+            Obstacle obstacle = other.transform.GetComponent<Obstacle>();
+            if (obstacle != null)
+            {
+                if (obstacle.ObstacleType == ObstacleType.Slide)
+                {
+                    SlideTimer?.Complete();
+                }
+            }
         }
+    }
+
+    public void Die()
+    {
+        Dead = true;
+        
     }
 
     private void OnDisable()

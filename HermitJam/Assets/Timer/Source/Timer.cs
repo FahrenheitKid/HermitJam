@@ -188,16 +188,16 @@ public class Timer
     }
 
     /// <summary>
-    /// Completes a timer that is in-progress or paused. The timer's on completion callback will not be called.
+    /// Completes a timer that is in-progress or paused. //The timer's on completion callback will not be called.
     /// </summary>
-    public void Complete()
+    public void Complete(bool CallOnCompleteCallback = true)
     {
         if (this.isDone || this.isCompleted)
         {
             return;
         }
         
-        if (this._onComplete != null)
+        if (this._onComplete != null && CallOnCompleteCallback)
         {
             this._onComplete();
         }
