@@ -18,15 +18,20 @@ public class MainMenu : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        _sceneLoader.LoadScene("Game", LoadSceneMode.Single, (container) =>
-        {
-            container.BindInstance(m_Difficulty).WhenInjectedInto<GameInstaller>();
-        });
+        
     }
 
     // Update is called once per frame
     void Update()
     {
         
+    }
+
+    public void StartGame()
+    {
+        _sceneLoader.LoadScene("Game", LoadSceneMode.Single, (container) =>
+        {
+            container.BindInstance(m_Difficulty).WhenInjectedInto<GameInstaller>();
+        });
     }
 }

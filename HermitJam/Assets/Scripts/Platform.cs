@@ -36,12 +36,6 @@ namespace HermitJam
             _rigidbody2D.velocity = new Vector2(-1 * _currentSpeed, 0);
         }
 
-        // Update is called once per frame
-        void FixedUpdate()
-        {
-            
-        }
-
         public void SetPlatformPosition(PlatformPosition position)
         {
             PlatformPosition = position;

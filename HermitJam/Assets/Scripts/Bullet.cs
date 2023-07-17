@@ -11,7 +11,6 @@ public class Bullet : MonoBehaviour
     private bool moveRight = true;
     public Action<Bullet> OnDeath;
     
-    
     private const string HitAnimatorTrigger = "Hit";
     private const string IdleAnimatorState = "Idle";
     private Animator m_Animator;

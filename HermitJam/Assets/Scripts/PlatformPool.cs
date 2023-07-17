@@ -8,7 +8,6 @@ using Zenject;
 
 public class PlatformPool : MonoBehaviour
 {
-    [SerializeField] private StageManager _stageManager;
     private EntitiesDatabase _entitiesDatabase;
     private GameObject _platformPrefab;
     private GameObject _acidPrefab;
@@ -16,7 +15,6 @@ public class PlatformPool : MonoBehaviour
 
     [SerializeField] private PlatformPosition _platformPosition;
     [SerializeField] private float _spawnXPosition = 10f;
-    [SerializeField] private bool collectionChecks = true;
     [SerializeField] private int _maxPoolSize;
     private DiContainer _diContainer;
     
@@ -25,9 +23,8 @@ public class PlatformPool : MonoBehaviour
     public Pool<Platform> SpikesPool { get; private set; }
 
     [Inject]
-    void Construct(StageManager stageManager, EntitiesDatabase entitiesDatabase, DiContainer diContainer)
+    void Construct(EntitiesDatabase entitiesDatabase, DiContainer diContainer)
     {
-        _stageManager = stageManager;
         _entitiesDatabase = entitiesDatabase;
         _diContainer = diContainer;
     }

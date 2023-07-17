@@ -259,8 +259,8 @@ MonoBehaviour:
   - {fileID: 4050057786446709369}
   - {fileID: 499670585107895659}
   - {fileID: 2859429095735529690}
-  _speed: 0
-  _currentSpeed: 5
+  _speed: 4
+  _currentSpeed: 4
   <Obstacles>k__BackingField: []
 --- !u!1 &1373281371346300145
 GameObject:

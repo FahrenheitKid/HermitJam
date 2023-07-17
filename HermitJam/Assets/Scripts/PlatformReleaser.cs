@@ -9,10 +9,24 @@ using Random = UnityEngine.Random;
 
 public class PlatformReleaser : MonoBehaviour
 {
+    
+    public struct PlatformInfo
+    {
+        public PlatformType platformType;
+        public bool hasObstacle;
+
+        public PlatformInfo(PlatformType platformType, bool hasObstacle)
+        {
+            this.platformType = platformType;
+            this.hasObstacle = hasObstacle;
+        }
+    }
     [Inject(Id = "FloorPool")]
     [SerializeField] private PlatformPool _floorPool;
     [Inject(Id = "CeilingPool")]
     [SerializeField] private PlatformPool _ceilingPool;
+
+    private PlatformInfo lastFloorPlatform, lastCeilingPlatform;
     public event Action<Platform> OnPlatformRelease;
 
     private StageManager _stageManager;
@@ -26,7 +40,7 @@ public class PlatformReleaser : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        lastFloorPlatform = lastCeilingPlatform = new PlatformInfo(PlatformType.Platform, false);
     }
 
     // Update is called once per frame
@@ -63,11 +77,26 @@ public class PlatformReleaser : MonoBehaviour
                         PlatformType hazardType = acidHazard ? PlatformType.Acid : PlatformType.Spike;
                         ObstacleType obstacleType = obstacle ? (ObstacleType) Random.Range(1,Enum.GetNames(typeof(ObstacleType)).Length) : ObstacleType.None;
                         
+                        //here we avoid having two obstacles together (one on floor/ceiling and the next in the opposite floor)
+                        if (obstacleType != ObstacleType.None && obstacle)
+                        {
+                            if ((obstacleOnFloor && lastCeilingPlatform.hasObstacle) ||
+                                (!obstacleOnFloor && lastFloorPlatform.hasObstacle) || 
+                                (obstacleOnFloor && lastFloorPlatform.hasObstacle) ||
+                                (!obstacleOnFloor && lastCeilingPlatform.hasObstacle))
+                            {
+                                obstacle = false;
+                            }
+                        }
+                        
                         _floorPool.SpawnPlatform(hazardOnFloor && hazard ? hazardType : PlatformType.Platform, 
                             obstacleOnFloor && obstacle ? obstacleType : ObstacleType.None);
                         _ceilingPool.SpawnPlatform(!hazardOnFloor && hazard ? hazardType : PlatformType.Platform, 
                             !obstacleOnFloor && obstacle ? obstacleType : ObstacleType.None);
-                    
+
+                        lastFloorPlatform.hasObstacle = obstacleOnFloor && obstacle;
+                        lastCeilingPlatform.hasObstacle = !obstacleOnFloor && obstacle;
+
                 }
                 else
                 {

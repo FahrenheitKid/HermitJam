@@ -25,14 +25,6 @@ public class ObstaclePool : MonoBehaviour
         _entitiesDatabase = entitiesDatabase;
         _diContainer = diContainer;
     }
-    
-    /*
-    public ObstaclePool( EntitiesDatabase entitiesDatabase)
-    {
-        _entitiesDatabase = entitiesDatabase;
-        Awake();
-        Start();
-    }*/
 
     private void Awake()
     {
@@ -143,10 +135,4 @@ public class ObstaclePool : MonoBehaviour
     }
 
     private void OnDestroyPoolObject(Obstacle obstacle) => GameObject.Destroy(obstacle);
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }
